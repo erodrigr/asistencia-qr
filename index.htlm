@@ -14,8 +14,7 @@ Asistencia QR
 </title>
 
 
-<script src="https://unpkg.com/html5-qrcode"></script>
-
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
 <style>
 
@@ -126,15 +125,16 @@ scanner = new Html5QrcodeScanner(
 "lector",
 
 {
-
 fps:10,
-
-qrbox:250
-
+qrbox:{
+width:250,
+height:250
 }
+},
+
+false
 
 );
-
 
 
 scanner.render(
