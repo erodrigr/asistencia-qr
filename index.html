@@ -1,207 +1,160 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistencia QR</title>
 
-<meta charset="UTF-8">
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body{
+            font-family:Arial,Helvetica,sans-serif;
+            background:#f4f6f7;
+            text-align:center;
+            margin:0;
+            padding:20px;
+        }
 
+        h1{
+            color:#1b4d3e;
+        }
 
-<title>
-Asistencia QR
-</title>
+        button{
+            background:#1b4d3e;
+            color:white;
+            border:none;
+            padding:15px 30px;
+            font-size:18px;
+            border-radius:10px;
+            cursor:pointer;
+        }
 
+        button:hover{
+            background:#236650;
+        }
 
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+        #lector{
+            width:320px;
+            margin:25px auto;
+        }
 
-<style>
-
-body{
-
-font-family:Arial, sans-serif;
-
-text-align:center;
-
-background:#f4f6f7;
-
-padding:20px;
-
-}
-
-
-h1{
-
-color:#1b4d3e;
-
-}
-
-
-#lector{
-
-width:320px;
-
-margin:auto;
-
-}
-
-
-button{
-
-background:#1b4d3e;
-
-color:white;
-
-border:none;
-
-padding:15px 30px;
-
-border-radius:10px;
-
-font-size:18px;
-
-}
-
-
-#resultado{
-
-margin-top:20px;
-
-font-size:20px;
-
-font-weight:bold;
-
-}
-
-
-</style>
-
-
+        #resultado{
+            margin-top:20px;
+            font-size:20px;
+            font-weight:bold;
+        }
+    </style>
 </head>
-
 
 <body>
 
+<h1>Asistencia QR</h1>
 
-<h1>
-Asistencia QR
-</h1>
-
-
-<button onclick="iniciarScanner()">
-
-Iniciar escáner
-
+<button id="btnScanner">
+    Iniciar escáner
 </button>
-
-
-<br><br>
-
 
 <div id="lector"></div>
 
-
 <div id="resultado">
-
-Esperando lectura...
-
+    Esperando lectura...
 </div>
-
-function errorLectura(error){
-    // No hacer nada
-}
 
 <script>
 
-
-let scanner;
-
 const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwL1KeSZCW4-JaVntEQGYYR5qVm8NFBZ8I7VMDn8UWsnjzxtmFmn2NDOEXFl4pYp5Kmvw/exec";
 
+let scanner = null;
+let escaneando = false;
 
+document.getElementById("btnScanner").addEventListener("click", iniciarScanner);
 
 function iniciarScanner(){
 
-
-scanner = new Html5QrcodeScanner(
-    "lector",
-    {
-        fps:10,
-        qrbox:{
-            width:250,
-            height:250
-        }
+    if(escaneando){
+        return;
     }
-);
 
+    escaneando = true;
 
-scanner.render(
+    document.getElementById("resultado").innerHTML="Abriendo cámara...";
 
-codigoLeido,
+    scanner = new Html5QrcodeScanner(
+        "lector",
+        {
+            fps:10,
+            qrbox:{
+                width:250,
+                height:250
+            }
+        }
+    );
 
-errorLectura
-
-);
-
+    scanner.render(codigoLeido,errorLectura);
 
 }
 
-
-
 async function codigoLeido(codigo){
 
-    scanner.clear();
+    escaneando=false;
 
-    const datos = codigo.split("|");
+    await scanner.clear();
 
-    const estudiante = {
+    const datos=codigo.split("|");
 
-        codigo: datos[0],
-        apellidos: datos[1] + " " + datos[2],
-        nombres: datos[3] + " " + datos[4],
-        sede: datos[5],
-        curso: datos[6]
+    if(datos.length<7){
+
+        document.getElementById("resultado").innerHTML=
+        "QR inválido";
+
+        return;
+
+    }
+
+    const estudiante={
+
+        codigo:datos[0],
+        apellidos:datos[1]+" "+datos[2],
+        nombres:datos[3]+" "+datos[4],
+        sede:datos[5],
+        curso:datos[6]
 
     };
 
-    document.getElementById("resultado").innerHTML =
-        "Registrando asistencia...";
+    document.getElementById("resultado").innerHTML=
+    "Registrando asistencia...";
 
     try{
 
-        const respuesta = await fetch(URL_SCRIPT,{
+        const respuesta=await fetch(URL_SCRIPT,{
             method:"POST",
-            redirect:"follow",
             headers:{
-                "Content-Type":"text/plain;charset=utf-8"
+                "Content-Type":"application/json"
             },
             body:JSON.stringify(estudiante)
         });
 
-        const resultado = await respuesta.json();
+        const json=await respuesta.json();
 
-        if(resultado.ok){
+        if(json.ok){
 
             document.getElementById("resultado").innerHTML=
-            "✅ Asistencia registrada<br><br>" +
-
-            estudiante.nombres + "<br>" +
-
-            estudiante.apellidos + "<br>" +
-
+            "✅ Asistencia registrada<br><br>"+
+            estudiante.nombres+"<br>"+
+            estudiante.apellidos+"<br>"+
             estudiante.curso;
 
         }else{
 
             document.getElementById("resultado").innerHTML=
-            "❌ Error al registrar";
+            "❌ "+json.error;
 
         }
 
-    }catch(error){
+    }catch(e){
 
-        console.log(error);
+        console.error(e);
 
         document.getElementById("resultado").innerHTML=
         "❌ Error de conexión";
@@ -210,15 +163,19 @@ async function codigoLeido(codigo){
 
     setTimeout(function(){
 
+        document.getElementById("lector").innerHTML="";
+
         iniciarScanner();
 
     },2000);
 
 }
+
+function errorLectura(error){
+    // Ignorar errores mientras busca un QR.
+}
+
 </script>
 
-
 </body>
-
-
 </html>
