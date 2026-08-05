@@ -108,7 +108,9 @@ Esperando lectura...
 
 </div>
 
-
+function errorLectura(error){
+    // No hacer nada
+}
 
 <script>
 
@@ -123,19 +125,14 @@ function iniciarScanner(){
 
 
 scanner = new Html5QrcodeScanner(
-
-"lector",
-
-{
-fps:10,
-qrbox:{
-width:250,
-height:250
-}
-},
-
-false
-
+    "lector",
+    {
+        fps:10,
+        qrbox:{
+            width:250,
+            height:250
+        }
+    }
 );
 
 
