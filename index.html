@@ -115,6 +115,8 @@ Esperando lectura...
 
 let scanner;
 
+const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwL1KeSZCW4-JaVntEQGYYR5qVm8NFBZ8I7VMDn8UWsnjzxtmFmn2NDOEXFl4pYp5Kmvw/exec";
+
 
 
 function iniciarScanner(){
@@ -150,28 +152,72 @@ errorLectura
 
 
 
-function codigoLeido(codigo){
+async function codigoLeido(codigo){
 
+    scanner.clear();
 
-scanner.clear();
+    const datos = codigo.split("|");
 
+    const estudiante = {
 
-document.getElementById("resultado").innerHTML=
+        codigo: datos[0],
+        apellidos: datos[1] + " " + datos[2],
+        nombres: datos[3] + " " + datos[4],
+        sede: datos[5],
+        curso: datos[6]
 
-"QR leído: "+codigo;
+    };
 
+    document.getElementById("resultado").innerHTML =
+        "Registrando asistencia...";
 
+    try{
+
+        const respuesta = await fetch(URL_SCRIPT,{
+            method:"POST",
+            redirect:"follow",
+            headers:{
+                "Content-Type":"text/plain;charset=utf-8"
+            },
+            body:JSON.stringify(estudiante)
+        });
+
+        const resultado = await respuesta.json();
+
+        if(resultado.ok){
+
+            document.getElementById("resultado").innerHTML=
+            "✅ Asistencia registrada<br><br>" +
+
+            estudiante.nombres + "<br>" +
+
+            estudiante.apellidos + "<br>" +
+
+            estudiante.curso;
+
+        }else{
+
+            document.getElementById("resultado").innerHTML=
+            "❌ Error al registrar";
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+        document.getElementById("resultado").innerHTML=
+        "❌ Error de conexión";
+
+    }
+
+    setTimeout(function(){
+
+        iniciarScanner();
+
+    },2000);
 
 }
-
-
-
-function errorLectura(error){
-
-}
-
-
-
 </script>
 
 
