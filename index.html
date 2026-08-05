@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<title>
+Asistencia QR
+</title>
+
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+<style>
+
+body{
+
+font-family:Arial, sans-serif;
+
+text-align:center;
+
+background:#f4f6f7;
+
+padding:20px;
+
+}
+
+
+h1{
+
+color:#1b4d3e;
+
+}
+
+
+#lector{
+
+width:320px;
+
+margin:auto;
+
+}
+
+
+button{
+
+background:#1b4d3e;
+
+color:white;
+
+border:none;
+
+padding:15px 30px;
+
+border-radius:10px;
+
+font-size:18px;
+
+}
+
+
+#resultado{
+
+margin-top:20px;
+
+font-size:20px;
+
+font-weight:bold;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<h1>
+Asistencia QR
+</h1>
+
+
+<button onclick="iniciarScanner()">
+
+Iniciar escáner
+
+</button>
+
+
+<br><br>
+
+
+<div id="lector"></div>
+
+
+<div id="resultado">
+
+Esperando lectura...
+
+</div>
+
+
+
+<script>
+
+
+let scanner;
+
+
+
+function iniciarScanner(){
+
+
+scanner = new Html5QrcodeScanner(
+
+"lector",
+
+{
+fps:10,
+qrbox:{
+width:250,
+height:250
+}
+},
+
+false
+
+);
+
+
+scanner.render(
+
+codigoLeido,
+
+errorLectura
+
+);
+
+
+}
+
+
+
+function codigoLeido(codigo){
+
+
+scanner.clear();
+
+
+document.getElementById("resultado").innerHTML=
+
+"QR leído: "+codigo;
+
+
+
+}
+
+
+
+function errorLectura(error){
+
+}
+
+
+
+</script>
+
+
+</body>
+
+
+</html>
