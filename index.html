@@ -2,6 +2,7 @@
 <html lang="es">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -11,22 +12,31 @@
 
   <title>Asistencia QR</title>
 
+
   <style>
 
     body {
+
       font-family: Arial, sans-serif;
+
       margin: 0;
+
       min-height: 100vh;
 
       display: flex;
+
       justify-content: center;
+
       align-items: center;
 
       background: #f4f6f8;
     }
 
+
     .contenedor {
+
       width: 90%;
+
       max-width: 500px;
 
       background: white;
@@ -41,24 +51,40 @@
         0 4px 15px rgba(0,0,0,0.10);
     }
 
+
     h1 {
+
       margin-bottom: 10px;
     }
 
-    #estado {
-      margin-top: 25px;
 
-      padding: 15px;
+    .campo {
 
-      border-radius: 10px;
+      width: 100%;
 
-      background: #eeeeee;
+      box-sizing: border-box;
+
+      padding: 12px;
+
+      margin-top: 10px;
+
+      border: 1px solid #ccc;
+
+      border-radius: 8px;
+
+      font-size: 18px;
+
+      text-align: center;
     }
 
+
     button {
+
+      width: 100%;
+
       margin-top: 20px;
 
-      padding: 12px 25px;
+      padding: 13px;
 
       border: none;
 
@@ -66,47 +92,97 @@
 
       cursor: pointer;
 
-      font-size: 16px;
+      font-size: 17px;
+    }
+
+
+    #estado {
+
+      margin-top: 20px;
+
+      padding: 12px;
+
+      border-radius: 8px;
+
+      background: #eeeeee;
+    }
+
+
+    #resultado {
+
+      margin-top: 20px;
+
+      padding: 15px;
+
+      border-radius: 8px;
+
+      min-height: 30px;
     }
 
   </style>
 
 </head>
 
+
 <body>
+
 
   <div class="contenedor">
 
     <h1>Asistencia QR</h1>
 
     <p>
-      Sistema de registro de asistencia
+      Registro de asistencia
     </p>
 
+
     <div id="estado">
+
       Comprobando conexión...
+
     </div>
 
-    <button onclick="probarConexion()">
-      Comprobar conexión
+
+    <input
+      id="idEstudiante"
+      class="campo"
+      type="text"
+      placeholder="ID del estudiante"
+      autocomplete="off"
+    >
+
+
+    <button onclick="registrar()">
+
+      Registrar asistencia
+
     </button>
+
+
+    <div id="resultado">
+
+    </div>
+
 
   </div>
 
 
   <script>
 
+
     const API_URL =
       "https://script.google.com/macros/s/AKfycbwA1aWSjxISmZU3FIRHuU2mzH2hBDVqlKCykqsXsPI056Q3qUZ79nXXh_d0L4ih5CL1/exec";
 
+
+    // --------------------------------
+    // COMPROBAR CONEXIÓN
+    // --------------------------------
 
     async function probarConexion() {
 
       const estado =
         document.getElementById("estado");
 
-      estado.textContent =
-        "Comprobando conexión...";
 
       try {
 
@@ -115,8 +191,10 @@
             API_URL + "?accion=estado"
           );
 
+
         const datos =
           await respuesta.json();
+
 
         if (datos.ok) {
 
@@ -126,9 +204,9 @@
         } else {
 
           estado.textContent =
-            "⚠ El servidor respondió, pero existe un problema";
-
+            "⚠ El servidor respondió con un problema";
         }
+
 
       } catch (error) {
 
@@ -141,9 +219,86 @@
     }
 
 
+    // --------------------------------
+    // REGISTRAR ASISTENCIA
+    // --------------------------------
+
+    async function registrar() {
+
+      const campo =
+        document.getElementById("idEstudiante");
+
+      const resultado =
+        document.getElementById("resultado");
+
+
+      const id =
+        campo.value.trim();
+
+
+      if (!id) {
+
+        resultado.textContent =
+          "⚠ Escriba el ID del estudiante";
+
+        return;
+      }
+
+
+      resultado.textContent =
+        "Registrando asistencia...";
+
+
+      try {
+
+        const respuesta =
+          await fetch(
+            API_URL +
+            "?accion=registrarAsistencia&id=" +
+            encodeURIComponent(id)
+          );
+
+
+        const datos =
+          await respuesta.json();
+
+
+        console.log(datos);
+
+
+        if (datos.ok) {
+
+          resultado.textContent =
+            "✓ " + datos.mensaje;
+
+
+          campo.value = "";
+
+
+        } else {
+
+          resultado.textContent =
+            "⚠ " + datos.mensaje;
+        }
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        resultado.textContent =
+          "✕ Error de comunicación con el servidor";
+      }
+
+    }
+
+
+    // Iniciar comprobación
+
     probarConexion();
 
   </script>
+
 
 </body>
 
