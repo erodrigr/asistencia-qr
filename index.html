@@ -121,6 +121,8 @@
 
   </style>
 
+<script src="https://unpkg.com/html5-qrcode"></script>
+  
 </head>
 
 
@@ -163,10 +165,24 @@
 
     </div>
 
+    <hr>
+
+<h2>Lector QR</h2>
+
+<div id="lectorQR"></div>
+
+<button onclick="iniciarLector()">
+  Iniciar cámara
+</button>
+
+<button onclick="detenerLector()">
+  Detener cámara
+</button>
 
   </div>
 
 
+  
   <script>
 
 
@@ -297,6 +313,112 @@
 
     probarConexion();
 
+let lectorQR = null;
+
+
+// --------------------------------
+// INICIAR LECTOR QR
+// --------------------------------
+
+function iniciarLector() {
+
+  if (lectorQR) {
+    return;
+  }
+
+  lectorQR = new Html5Qrcode("lectorQR");
+
+
+  lectorQR.start(
+
+    { facingMode: "environment" },
+
+    {
+      fps: 10,
+
+      qrbox: {
+        width: 250,
+        height: 250
+      }
+    },
+
+
+    (textoQR) => {
+
+      console.log(
+        "QR detectado:",
+        textoQR
+      );
+
+
+      // Detener cámara
+      detenerLector();
+
+
+      // Colocar el resultado del QR
+      document.getElementById(
+        "idEstudiante"
+      ).value = textoQR;
+
+
+      // Registrar asistencia
+      registrar();
+
+    },
+
+
+    (error) => {
+
+      // Los errores normales de lectura
+      // no necesitan mostrarse.
+      
+    }
+
+  ).catch(error => {
+
+    console.error(error);
+
+    document.getElementById(
+      "resultado"
+    ).textContent =
+      "✕ No se pudo acceder a la cámara";
+
+  });
+
+}
+
+
+// --------------------------------
+// DETENER LECTOR QR
+// --------------------------------
+
+function detenerLector() {
+
+  if (!lectorQR) {
+    return;
+  }
+
+
+  lectorQR.stop()
+
+    .then(() => {
+
+      lectorQR.clear();
+
+      lectorQR = null;
+
+    })
+
+    .catch(error => {
+
+      console.error(error);
+
+      lectorQR = null;
+
+    });
+
+}
+    
   </script>
 
 
