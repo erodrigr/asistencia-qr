@@ -343,29 +343,43 @@ function iniciarLector() {
     },
 
 
-    (textoQR) => {
+(textoQR) => {
 
-      console.log(
-        "QR detectado:",
-        textoQR
-      );
-
-
-      // Detener cámara
-      detenerLector();
+  console.log(
+    "QR detectado:",
+    textoQR
+  );
 
 
-      // Colocar el resultado del QR
-      document.getElementById(
-        "idEstudiante"
-      ).value = textoQR;
+  const id = textoQR.trim();
 
 
-      // Registrar asistencia
-      registrar();
+  // Validar formato básico del ID
+  if (!/^EST\d{5}$/.test(id)) {
 
-    },
+    document.getElementById(
+      "resultado"
+    ).textContent =
+      "⚠ El código QR no corresponde a un estudiante válido";
 
+    return;
+  }
+
+
+  // Detener cámara
+  detenerLector();
+
+
+  // Colocar el resultado
+  document.getElementById(
+    "idEstudiante"
+  ).value = id;
+
+
+  // Registrar asistencia
+  registrar();
+
+},
 
     (error) => {
 
