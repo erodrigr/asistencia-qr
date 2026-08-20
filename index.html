@@ -1,181 +1,150 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistencia QR</title>
+  <meta charset="UTF-8">
 
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-    <style>
-        body{
-            font-family:Arial,Helvetica,sans-serif;
-            background:#f4f6f7;
-            text-align:center;
-            margin:0;
-            padding:20px;
-        }
+  <title>Asistencia QR</title>
 
-        h1{
-            color:#1b4d3e;
-        }
+  <style>
 
-        button{
-            background:#1b4d3e;
-            color:white;
-            border:none;
-            padding:15px 30px;
-            font-size:18px;
-            border-radius:10px;
-            cursor:pointer;
-        }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
 
-        button:hover{
-            background:#236650;
-        }
+      display: flex;
+      justify-content: center;
+      align-items: center;
 
-        #lector{
-            width:320px;
-            margin:25px auto;
-        }
+      background: #f4f6f8;
+    }
 
-        #resultado{
-            margin-top:20px;
-            font-size:20px;
-            font-weight:bold;
-        }
-    </style>
+    .contenedor {
+      width: 90%;
+      max-width: 500px;
+
+      background: white;
+
+      padding: 30px;
+
+      border-radius: 15px;
+
+      text-align: center;
+
+      box-shadow:
+        0 4px 15px rgba(0,0,0,0.10);
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    #estado {
+      margin-top: 25px;
+
+      padding: 15px;
+
+      border-radius: 10px;
+
+      background: #eeeeee;
+    }
+
+    button {
+      margin-top: 20px;
+
+      padding: 12px 25px;
+
+      border: none;
+
+      border-radius: 8px;
+
+      cursor: pointer;
+
+      font-size: 16px;
+    }
+
+  </style>
+
 </head>
 
 <body>
 
-<h1>Asistencia QR</h1>
+  <div class="contenedor">
 
-<button id="btnScanner">
-    Iniciar escáner
-</button>
+    <h1>Asistencia QR</h1>
 
-<div id="lector"></div>
+    <p>
+      Sistema de registro de asistencia
+    </p>
 
-<div id="resultado">
-    Esperando lectura...
-</div>
+    <div id="estado">
+      Comprobando conexión...
+    </div>
 
-<script>
+    <button onclick="probarConexion()">
+      Comprobar conexión
+    </button>
 
-const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbwL1KeSZCW4-JaVntEQGYYR5qVm8NFBZ8I7VMDn8UWsnjzxtmFmn2NDOEXFl4pYp5Kmvw/exec";
+  </div>
 
-let scanner = null;
-let escaneando = false;
 
-document.getElementById("btnScanner").addEventListener("click", iniciarScanner);
+  <script>
 
-function iniciarScanner(){
+    const API_URL =
+      "https://script.google.com/macros/s/AKfycbwA1aWSjxISmZU3FIRHuU2mzH2hBDVqlKCykqsXsPI056Q3qUZ79nXXh_d0L4ih5CL1/exec";
 
-    if(escaneando){
-        return;
-    }
 
-    escaneando = true;
+    async function probarConexion() {
 
-    document.getElementById("resultado").innerHTML="Abriendo cámara...";
+      const estado =
+        document.getElementById("estado");
 
-    scanner = new Html5QrcodeScanner(
-        "lector",
-        {
-            fps:10,
-            qrbox:{
-                width:250,
-                height:250
-            }
-        }
-    );
+      estado.textContent =
+        "Comprobando conexión...";
 
-    scanner.render(codigoLeido,errorLectura);
+      try {
 
-}
+        const respuesta =
+          await fetch(
+            API_URL + "?accion=estado"
+          );
 
-async function codigoLeido(codigo){
+        const datos =
+          await respuesta.json();
 
-    escaneando=false;
+        if (datos.ok) {
 
-    await scanner.clear();
+          estado.textContent =
+            "✓ Servidor conectado";
 
-    const datos=codigo.split("|");
+        } else {
 
-    if(datos.length<7){
-
-        document.getElementById("resultado").innerHTML=
-        "QR inválido";
-
-        return;
-
-    }
-
-    const estudiante={
-
-        codigo:datos[0],
-        apellidos:datos[1]+" "+datos[2],
-        nombres:datos[3]+" "+datos[4],
-        sede:datos[5],
-        curso:datos[6]
-
-    };
-
-    document.getElementById("resultado").innerHTML=
-    "Registrando asistencia...";
-
-    try{
-
-        const respuesta=await fetch(URL_SCRIPT,{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(estudiante)
-        });
-
-        const json=await respuesta.json();
-
-        if(json.ok){
-
-            document.getElementById("resultado").innerHTML=
-            "✅ Asistencia registrada<br><br>"+
-            estudiante.nombres+"<br>"+
-            estudiante.apellidos+"<br>"+
-            estudiante.curso;
-
-        }else{
-
-            document.getElementById("resultado").innerHTML=
-            "❌ "+json.error;
+          estado.textContent =
+            "⚠ El servidor respondió, pero existe un problema";
 
         }
 
-    }catch(e){
+      } catch (error) {
 
-        console.error(e);
+        console.error(error);
 
-        document.getElementById("resultado").innerHTML=
-        "❌ Error de conexión";
+        estado.textContent =
+          "✕ No se pudo conectar con el servidor";
+      }
 
     }
 
-    setTimeout(function(){
 
-        document.getElementById("lector").innerHTML="";
+    probarConexion();
 
-        iniciarScanner();
-
-    },2000);
-
-}
-
-function errorLectura(error){
-    // Ignorar errores mientras busca un QR.
-}
-
-</script>
+  </script>
 
 </body>
+
 </html>
