@@ -239,75 +239,225 @@
     // REGISTRAR ASISTENCIA
     // --------------------------------
 
-    async function registrar() {
+async function registrar() {
 
-      const campo =
-        document.getElementById("idEstudiante");
+  const campo =
+    document.getElementById("idEstudiante");
 
-      const resultado =
-        document.getElementById("resultado");
+  const resultado =
+    document.getElementById("resultado");
 
-
-      const id =
-        campo.value.trim();
-
-
-      if (!id) {
-
-        resultado.textContent =
-          "⚠ Escriba el ID del estudiante";
-
-        return;
-      }
+  const id =
+    campo.value.trim();
 
 
-      resultado.textContent =
-        "Registrando asistencia...";
+  if (!id) {
+
+    resultado.innerHTML =
+      "⚠ Escriba el ID del estudiante";
+
+    return;
+  }
 
 
-      try {
-
-        const respuesta =
-          await fetch(
-            API_URL +
-            "?accion=registrarAsistencia&id=" +
-            encodeURIComponent(id)
-          );
+  resultado.innerHTML =
+    "Registrando asistencia...";
 
 
-        const datos =
-          await respuesta.json();
+  try {
+
+    const respuesta =
+      await fetch(
+        API_URL +
+        "?accion=registrarAsistencia&id=" +
+        encodeURIComponent(id)
+      );
 
 
-        console.log(datos);
+    const datos =
+      await respuesta.json();
 
 
-        if (datos.ok) {
-
-          resultado.textContent =
-            "✓ " + datos.mensaje;
+    console.log(datos);
 
 
-          campo.value = "";
+    // --------------------------------
+    // ASISTENCIA REGISTRADA
+    // --------------------------------
+
+    if (
+      datos.ok &&
+      datos.tipo === "REGISTRADA"
+    ) {
+
+      const estudiante =
+        datos.estudiante;
+
+      const asistencia =
+        datos.asistencia;
 
 
-        } else {
+      resultado.innerHTML = `
+        <div>
+          <h2>✓ ASISTENCIA REGISTRADA</h2>
 
-          resultado.textContent =
-            "⚠ " + datos.mensaje;
-        }
+          <p>
+            <strong>
+              ${estudiante.nombres}
+            </strong>
+          </p>
+
+          <p>
+            <strong>
+              ${estudiante.apellidos}
+            </strong>
+          </p>
+
+          <p>
+            Curso: ${asistencia.curso}
+          </p>
+
+          <p>
+            Fecha: ${asistencia.fecha}
+          </p>
+        </div>
+      `;
 
 
-      } catch (error) {
+      campo.value = "";
 
-        console.error(error);
 
-        resultado.textContent =
-          "✕ Error de comunicación con el servidor";
-      }
-
+      return;
     }
 
+
+    // --------------------------------
+    // DUPLICADO
+    // --------------------------------
+
+    if (
+      datos.tipo === "DUPLICADO"
+    ) {
+
+      const estudiante =
+        datos.estudiante;
+
+
+      resultado.innerHTML = `
+        <div>
+
+          <h2>⚠ ASISTENCIA YA REGISTRADA</h2>
+
+          <p>
+            <strong>
+              ${estudiante.nombres}
+            </strong>
+          </p>
+
+          <p>
+            <strong>
+              ${estudiante.apellidos}
+            </strong>
+          </p>
+
+          <p>
+            Fecha: ${datos.fecha}
+          </p>
+
+        </div>
+      `;
+
+
+      campo.value = "";
+
+
+      return;
+    }
+
+
+    // --------------------------------
+    // ESTUDIANTE INACTIVO
+    // --------------------------------
+
+    if (
+      datos.tipo === "INACTIVO"
+    ) {
+
+      const estudiante =
+        datos.estudiante;
+
+
+      resultado.innerHTML = `
+        <div>
+
+          <h2>⚠ ESTUDIANTE INACTIVO</h2>
+
+          <p>
+            <strong>
+              ${estudiante.nombres}
+            </strong>
+          </p>
+
+          <p>
+            <strong>
+              ${estudiante.apellidos}
+            </strong>
+          </p>
+
+          <p>
+            No se puede registrar
+            la asistencia.
+          </p>
+
+        </div>
+      `;
+
+
+      campo.value = "";
+
+
+      return;
+    }
+
+
+    // --------------------------------
+    // NO ENCONTRADO
+    // --------------------------------
+
+    if (
+      datos.tipo === "NO_ENCONTRADO"
+    ) {
+
+      resultado.innerHTML =
+        "⚠ El estudiante no existe";
+
+      campo.value = "";
+
+      return;
+    }
+
+
+    // --------------------------------
+    // OTRO ERROR
+    // --------------------------------
+
+    resultado.innerHTML =
+      "⚠ " + (
+        datos.mensaje ||
+        "No fue posible registrar la asistencia."
+      );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    resultado.innerHTML =
+      "✕ Error de comunicación con el servidor";
+
+  }
+
+}
 
     // Iniciar comprobación
 
