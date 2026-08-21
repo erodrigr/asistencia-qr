@@ -600,6 +600,35 @@ function detenerLector() {
     });
 
 }
+
+function generarQR() {
+
+  const campo =
+    document.getElementById("idQR");
+
+  const contenedor =
+    document.getElementById("qrGenerado");
+
+  const id =
+    campo.value.trim();
+
+  if (!id) {
+
+    contenedor.innerHTML =
+      "⚠ Escriba el ID del estudiante";
+
+    return;
+  }
+
+  contenedor.innerHTML = "";
+
+  new QRCode(contenedor, {
+    text: id,
+    width: 250,
+    height: 250
+  });
+}
+
     
   </script>
 
