@@ -13,114 +13,171 @@
   <title>Asistencia QR</title>
 
 
-  <style>
+<style>
 
-    body {
+  * {
+    box-sizing: border-box;
+  }
 
-      font-family: Arial, sans-serif;
+  body {
 
-      margin: 0;
+    font-family: Arial, sans-serif;
 
-      min-height: 100vh;
+    margin: 0;
 
-      display: flex;
+    min-height: 100vh;
 
-      justify-content: center;
+    display: flex;
 
-      align-items: center;
+    justify-content: center;
 
-      background: #f4f6f8;
-    }
+    align-items: flex-start;
 
+    padding: 20px;
 
-    .contenedor {
-
-      width: 90%;
-
-      max-width: 500px;
-
-      background: white;
-
-      padding: 30px;
-
-      border-radius: 15px;
-
-      text-align: center;
-
-      box-shadow:
-        0 4px 15px rgba(0,0,0,0.10);
-    }
+    background: #f4f6f8;
+  }
 
 
-    h1 {
+  .contenedor {
 
-      margin-bottom: 10px;
-    }
+    width: 100%;
 
+    max-width: 500px;
 
-    .campo {
+    background: white;
 
-      width: 100%;
+    padding: 25px;
 
-      box-sizing: border-box;
+    border-radius: 15px;
 
-      padding: 12px;
+    text-align: center;
 
-      margin-top: 10px;
-
-      border: 1px solid #ccc;
-
-      border-radius: 8px;
-
-      font-size: 18px;
-
-      text-align: center;
-    }
+    box-shadow:
+      0 4px 15px rgba(0,0,0,0.10);
+  }
 
 
-    button {
+  h1 {
 
-      width: 100%;
+    margin-top: 0;
 
-      margin-top: 20px;
-
-      padding: 13px;
-
-      border: none;
-
-      border-radius: 8px;
-
-      cursor: pointer;
-
-      font-size: 17px;
-    }
+    margin-bottom: 8px;
+  }
 
 
-    #estado {
+  h2 {
 
-      margin-top: 20px;
+    margin-top: 20px;
 
-      padding: 12px;
-
-      border-radius: 8px;
-
-      background: #eeeeee;
-    }
+    margin-bottom: 15px;
+  }
 
 
-    #resultado {
+  .campo {
 
-      margin-top: 20px;
+    width: 100%;
 
-      padding: 15px;
+    padding: 12px;
 
-      border-radius: 8px;
+    margin-top: 10px;
 
-      min-height: 30px;
-    }
+    border: 1px solid #ccc;
 
-  </style>
+    border-radius: 8px;
 
+    font-size: 18px;
+
+    text-align: center;
+  }
+
+
+  button {
+
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 13px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+  }
+
+
+  #estado {
+
+    margin-top: 20px;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    background: #eeeeee;
+  }
+
+
+  #resultado {
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    border-radius: 8px;
+
+    min-height: 30px;
+  }
+
+
+  #lectorQR {
+
+    width: 100%;
+
+    max-width: 350px;
+
+    margin: 0 auto;
+
+    overflow: hidden;
+  }
+
+
+  #qrGenerado {
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    margin-top: 20px;
+  }
+
+
+  #qrGenerado img {
+
+    max-width: 100%;
+
+    height: auto;
+  }
+
+
+  hr {
+
+    margin: 30px 0;
+
+    border: 0;
+
+    border-top: 1px solid #ddd;
+  }
+
+</style>
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   
