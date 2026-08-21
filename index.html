@@ -56,39 +56,6 @@
     box-shadow:
       0 4px 15px rgba(0,0,0,0.10);
 
-<hr>
-
-<h2>Lector QR</h2>
-
-<div id="lectorQR"></div>
-
-<button onclick="iniciarLector()">
-  Iniciar cámara
-</button>
-
-<button onclick="detenerLector()">
-  Detener cámara
-</button>
-
-
-    <hr>
-
-<h2>Generar QR</h2>
-
-<input
-  id="idQR"
-  class="campo"
-  type="text"
-  placeholder="ID del estudiante"
-  autocomplete="off"
->
-
-<button onclick="generarQR()">
-  Generar QR
-</button>
-
-<div id="qrGenerado"></div>
-    
   }
 
 
@@ -271,6 +238,24 @@
   Detener cámara
 </button>
 
+<hr>
+
+<h2>Generar QR</h2>
+
+<input
+  id="idQR"
+  class="campo"
+  type="text"
+  placeholder="ID del estudiante"
+  autocomplete="off"
+>
+
+<button onclick="generarQR()">
+  Generar QR
+</button>
+
+<div id="qrGenerado"></div>    
+    
   </div>
 
 <hr>
